@@ -1,30 +1,36 @@
+var win = $(window);
+
 var stopFixedScroll = function( slideNum ){
-	
-$(window).scroll( function() {
+
   var id = "slide" + slideNum;
-  var className = '.slide' + slideNum;
-  var container = '.container' + slideNum;
-
   var mult = slideNum / (slideNum + 1);
-  var wrapBottom = ( $(container).position().top + $(container).outerHeight(true) ) * mult;
-  var scrollPos = $(window).scrollTop();
 
-  if ( scrollPos > wrapBottom ){
-      if( document.getElementById( id ).hasAttribute('style') ){
-          $( className ).removeAttr( 'style' );
+  win.ready( function(){ //wait 'til the DOM is ready
+
+    var $slide = $('.slide' + slideNum ); //get the selectors
+    var $container = $('.container' + slideNum );
+   
+    win.scroll( function() { //when the user scrolls do this stuff
+      
+      var wrapBottom = ( $container.outerHeight(true) ) * mult; //find out the height of the container, subtract the size of the slide
+      var scrollPos = win.scrollTop();
+
+      if ( scrollPos > wrapBottom ){ //if the window is scrolled past the bottom of the container...
+          if( document.getElementById( id ).hasAttribute('style') ){
+              $slide.removeAttr( 'style' ); //...remove the style attribute on the slide if there is one...
+          }
+          $slide.css( { position: 'absolute', 
+                                            top: wrapBottom + 'px'
+                                          }); //then add this one with absolute positioning
       }
-      $( className ).css( { position: 'absolute', 
-                                        top: wrapBottom + 'px'
-                                      });
-  }
-  else {
-      if( document.getElementById( id ).hasAttribute('style') ){
-          $( className ).removeAttr( 'style' );
+      else { //if it's not past the bottom of the container (like if the user is scrolling back up)...
+          if( document.getElementById( id ).hasAttribute('style') ){
+              $slide.removeAttr( 'style' );//...remove the style attribute on the slide if there is one...
+          }
+          $slide.css( { position: 'fixed', 'margin-top': '0px'}); //then add this one with fixed positioning
       }
-      $( className ).css( { position: 'fixed', 'margin-top': '0px'});
-  }
-});
-	
+    });
+  });
 };
 
 stopFixedScroll(1);
